@@ -1,4 +1,65 @@
+import wixData from 'wix-data';
+
+export function updateScoreForPerson(prenom, newScore) {
+    wixData.query("ClassementEquipe1")
+        .eq("title", prenom)
+        .find()
+        .then((results) => {
+            if (results.items.length > 0) {
+                let item = results.items[0];  // Get the first matching item
+                item.score = newScore;  // Update the score field
+                return wixData.update("ClassementEquipe1", item);
+            } else {
+                console.log("No person found with the given ID.");
+            }
+        })
+        .then((updatedItem) => {
+            console.log("Score updated for person:", updatedItem);
+            refreshUI();  // Call a function to refresh the UI with updated data
+        })
+        .catch((error) => {
+            console.error("Error updating score:", error);
+        });
+}
+
+export function updateTotalForTeam(teamName, newTotal) {
+    wixData.query("Totalequipe")
+        .eq("title", teamName)
+        .find()
+        .then((results) => {
+            if (results.items.length > 0) {
+                let item = results.items[0];
+                item.reference = newTotal;
+                return wixData.update("Totalequipe", item);
+            } else {
+                console.log("No team found with the given name.");
+            }
+        })
+        .then((updatedItem) => {
+            console.log("TOTAL updated for team:", updatedItem);
+            refreshUI();  // Call a function to refresh the UI with updated data
+        })
+        .catch((error) => {
+            console.error("Error updating TOTAL:", error);
+        });
+}
+
+// Example of a function to refresh the UI
+function refreshUI() {
+    wixData.query("ClassementEquipe1")
+        .find()
+        .then((results) => {
+            $w("#classementPerso").data = results.items;  // Update the repeater with fresh data
+        });
+
+    wixData.query("Totalequipe")
+        .find()
+        .then((results) => {
+            $w("#classmentEquipes").data = results.items;  // Update the repeater with fresh data
+        });
+}
 
 $w.onReady(function () {
-  const csvUrl = 'https://c74864aa-9cb7-4b46-9135-26196254e205.usrfiles.com/ugd/c74864_f0ac6aaf74dc49578f4f21b5b8e0492a.csv';
+    updateScoreForPerson("Jules", 0);
+    updateTotalForTeam("equipe1", 0);
 });

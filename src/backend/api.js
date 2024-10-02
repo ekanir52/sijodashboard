@@ -5,11 +5,11 @@ export async function post_data(request) {
     let options = {
         "suppressAuth": true,
         "suppressHooks": true
-    };
+    };  
 
     const body = await request.body.json();
 
-    const result = await insert("Classement", {
+    const result = await insert("ClassementEquipe1", {
         prenom: body.prenom,
         Score: body.Score,
         Equipe: body.Equipe
