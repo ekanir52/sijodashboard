@@ -1,4 +1,4 @@
-import wixData from 'wix-data';
+// import wixData from 'wix-data';
 
 // export function updateScoreForPerson(prenom, newScore) {
 //     wixData.query("ClassementEquipe1")
@@ -60,27 +60,5 @@ import wixData from 'wix-data';
 // }
 
 $w.onReady(function () {
-    wixData.query("ClassementEquipe1")
-        .eq("poste", "cdi")
-        .ascending("score")
-        .find()
-        .then((results) => {
-            $w("#rpcdi").data = results.items;
-            console.log(results)
-        })
-        .catch((err) => {
-            console.log(err);
-        });
 
-    wixData.query("ClassementEquipe1")
-        .eq("poste", "alternant")
-        .descending("score")
-        .find()
-        .then((results) => {
-            $w("#rpalternant").data = results.items;
-            console.log(results)
-        })
-        .catch((err) => {
-            console.log(err);
-        });
 });
