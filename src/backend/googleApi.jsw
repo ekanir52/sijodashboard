@@ -1,0 +1,25 @@
+import wixSecretsBackend from 'wix-secrets-backend';
+import { fetch } from 'wix-fetch';
+
+async function getSecretSheetId() {
+  return await wixSecretsBackend.getSecret("sheetId");
+}
+
+async function getApiKey() {
+  return await wixSecretsBackend.getSecret("googleApiKey");
+}
+
+export async function getValuesFromSheet(range) {
+  const sheetId = await getSecretSheetId();
+  const apiKey = await getApiKey();
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`;
+
+  const response = await fetch(url, { method: "GET" });
+
+  if (response.ok) {
+    const json = await response.json();
+    return json.values;
+  } else {
+    throw new Error("Failed to fetch values. Status: " + response.status);
+  }
+}

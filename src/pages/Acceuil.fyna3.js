@@ -1,5 +1,53 @@
-// import wixData from 'wix-data';
+import wixData from 'wix-data';
+import wixLocation from 'wix-location';
+import { getValuesFromSheet } from 'backend/googleApi';
 
+
+async function checkData(){
+    console.log("Checking Data...")
+    let scores = await getValuesFromSheet("commerciaux!G2:G3");
+    $w("#text180").text = scores[0].toString();
+    console.log("Score 1 : "+ scores[0] + " et score 2 : "+ scores[1]);
+    $w("#text181").text = scores[1].toString();
+    let res = await getValuesFromSheet("commerciaux!A2:B10");
+    for(let i = 0; i < res.length ; i++) {
+        let player = res[i];
+        let results = await wixData.query("alternant")
+                            .eq("prenom",player[0])
+                            .find()
+        if(results.items.length>0) {
+                let item = results.items[0];
+                item.score = Number(player[1].replace(',','.'));
+                await wixData.update("alternant", item);
+        }
+
+        results = await wixData.query("cdi")
+                            .eq("prenom",player[0])
+                            .find()
+        if(results.items.length>0) {
+                let item = results.items[0];
+                item.score = Number(player[1].replace(',','.'));
+                await wixData.update("cdi", item);
+            }
+        
+    }
+    // refreshUI();
+    
+}
+$w.onReady(function () {
+    // setInterval(() => {
+    //     checkData();
+    // }, 10000);
+    checkData();
+    setTimeout(()=>{
+        wixLocation.to(wixLocation.url);
+    },2*60000)
+}
+);
+
+
+
+// https://docs.google.com/spreadsheets/d/1YrJJq8twmXI4XL0e6lAkwr85_zSbfJup5IxlkDemJD4/edit?usp=sharing
 // export function updateScoreForPerson(prenom, newScore) {
 //     wixData.query("ClassementEquipe1")
 //         .eq("title", prenom)
@@ -44,21 +92,3 @@
 //         });
 // }
 
-// // Example of a function to refresh the UI
-// function refreshUI() {
-//     wixData.query("ClassementEquipe1")
-//         .find()
-//         .then((results) => {
-//             $w("#classementPerso").data = results.items;  // Update the repeater with fresh data
-//         });
-
-//     wixData.query("Totalequipe")
-//         .find()
-//         .then((results) => {
-//             $w("#classmentEquipes").data = results.items;  // Update the repeater with fresh data
-//         });
-// }
-
-$w.onReady(function () {
-
-});
