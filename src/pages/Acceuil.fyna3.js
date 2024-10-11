@@ -1,14 +1,18 @@
 import wixData from 'wix-data';
 import wixLocation from 'wix-location';
 import { getValuesFromSheet } from 'backend/googleApi';
-
-
+ 
+ 
 async function checkData(){
-    console.log("Checking Data...")
+    // console.log("Checking Data...")
     let scores = await getValuesFromSheet("commerciaux!G2:G3");
-    $w("#text180").text = scores[0].toString();
-    console.log("Score 1 : "+ scores[0] + " et score 2 : "+ scores[1]);
-    $w("#text181").text = scores[1].toString();
+    // console.log($w("#text181"));
+    $w("#text181").text = scores[0].toString();
+    // console.log("Score 1 : "+ scores[0] + " et score 2 : "+ scores[1]);
+    $w("#text180").text = scores[1].toString();
+
+    waitForLoading();
+    
     let res = await getValuesFromSheet("commerciaux!A2:B10");
     for(let i = 0; i < res.length ; i++) {
         let player = res[i];
@@ -20,7 +24,7 @@ async function checkData(){
                 item.score = Number(player[1].replace(',','.'));
                 await wixData.update("alternant", item);
         }
-
+ 
         results = await wixData.query("cdi")
                             .eq("prenom",player[0])
                             .find()
@@ -34,61 +38,45 @@ async function checkData(){
     // refreshUI();
     
 }
+ 
+ 
+async function setCountdown(){
+    
+    let future  = Date.parse("Decembre 31, 2024 23:59:00");
+    let diff    = future - new Date();
+  
+    let days  = Math.floor( diff / (1000*60*60*24) );
+    let hours = Math.floor( diff / (1000*60*60) );
+    let mins  = Math.floor( diff / (1000*60) );
+    let secs  = Math.floor( diff / 1000 );
+  
+    let d = days;
+    let h = hours - days  * 24;
+    let m = mins  - hours * 60;
+    let s = secs  - mins  * 60;
+  
+    // console.log("update timer");
+    // console.log(d,h,m,s);
+    $w("#text189").text = String(s);
+    $w("#text187").text = String(m);
+    $w("#text185").text = String(h);
+    $w("#text182").text = String(d);
+}
+
+function waitForLoading(){
+    $w("#box36").hide("Fadeout")
+}
 $w.onReady(function () {
-    // setInterval(() => {
-    //     checkData();
-    // }, 10000);
+ 
     checkData();
+    
+
+    setInterval(()=> setCountdown(), 1000);
+ 
     setTimeout(()=>{
         wixLocation.to(wixLocation.url);
     },2*60000)
+ 
+ 
 }
 );
-
-
-
-// https://docs.google.com/spreadsheets/d/1YrJJq8twmXI4XL0e6lAkwr85_zSbfJup5IxlkDemJD4/edit?usp=sharing
-// export function updateScoreForPerson(prenom, newScore) {
-//     wixData.query("ClassementEquipe1")
-//         .eq("title", prenom)
-//         .find()
-//         .then((results) => {
-//             if (results.items.length > 0) {
-//                 let item = results.items[0];  // Get the first matching item
-//                 item.score = newScore;  // Update the score field
-//                 return wixData.update("ClassementEquipe1", item);
-//             } else {
-//                 console.log("No person found with the given ID.");
-//             }
-//         })
-//         .then((updatedItem) => {
-//             console.log("Score updated for person:", updatedItem);
-//             refreshUI();  // Call a function to refresh the UI with updated data
-//         })
-//         .catch((error) => {
-//             console.error("Error updating score:", error);
-//         });
-// }
-
-// export function updateTotalForTeam(teamName, newTotal) {
-//     wixData.query("Totalequipe")
-//         .eq("title", teamName)
-//         .find()
-//         .then((results) => {
-//             if (results.items.length > 0) {
-//                 let item = results.items[0];
-//                 item.reference = newTotal;
-//                 return wixData.update("Totalequipe", item);
-//             } else {
-//                 console.log("No team found with the given name.");
-//             }
-//         })
-//         .then((updatedItem) => {
-//             console.log("TOTAL updated for team:", updatedItem);
-//             refreshUI();  // Call a function to refresh the UI with updated data
-//         })
-//         .catch((error) => {
-//             console.error("Error updating TOTAL:", error);
-//         });
-// }
-
