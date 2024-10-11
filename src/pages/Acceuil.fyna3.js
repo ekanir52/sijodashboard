@@ -5,11 +5,15 @@ import { getValuesFromSheet } from 'backend/googleApi';
  
 async function checkData(){
     // console.log("Checking Data...")
-    let scores = await getValuesFromSheet("commerciaux!G2:G3");
-    // console.log($w("#text181"));
-    $w("#text181").text = scores[0].toString();
-    // console.log("Score 1 : "+ scores[0] + " et score 2 : "+ scores[1]);
-    $w("#text180").text = scores[1].toString();
+    try{
+        let scores = await getValuesFromSheet("commerciaux!G2:G3");
+        // console.log($w("#text181"));
+        $w("#text181").text = scores[0].toString();
+        // console.log("Score 1 : "+ scores[0] + " et score 2 : "+ scores[1]);
+        $w("#text180").text = scores[1].toString();
+    } catch(e){
+        wixLocation.to(wixLocation.url);
+    }
 
     waitForLoading();
     
@@ -64,18 +68,20 @@ async function setCountdown(){
 }
 
 function waitForLoading(){
-    $w("#box36").hide("Fadeout")
+    $w("#box36").hide("fade")
 }
 $w.onReady(function () {
  
-    checkData();
-    
+    setInterval(()=> {
+        setCountdown();
+    }, 1000);
+    })
+    checkData().then(()=>{
 
-    setInterval(()=> setCountdown(), 1000);
  
     setTimeout(()=>{
         wixLocation.to(wixLocation.url);
-    },2*60000)
+    },5*60000)
  
  
 }
