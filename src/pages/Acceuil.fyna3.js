@@ -7,11 +7,28 @@ async function checkData(){
     // console.log("Checking Data...")
     try{
         let scores = await getValuesFromSheet("commerciaux!G2:G3");
-        // console.log($w("#text181"));
-        $w("#text181").text = scores[0].toString();
-        // console.log("Score 1 : "+ scores[0] + " et score 2 : "+ scores[1]);
-        $w("#text180").text = scores[1].toString();
+        // Update the "equipes" table with these two scores
+        let teamNames = ["equipe1", "equipe2"];
+        for (let i = 0; i < teamNames.length; i++) {
+            let teamName = teamNames[i];
+            let teamScore = Number(scores[i].toString().replace(',', '.'));
+//
+            // Query the "equipes" collection by team name and update the score
+            let results = await wixData.query("equipes")
+                                .eq("idequipe", teamName)
+                                .find();
+                            //
+            if (results.items.length > 0) {
+                let item = results.items[0];
+                item.score = teamScore;
+                await wixData.update("equipes", item);
+            }
+        }
+        // $w("#text181").text = scores[0].toString();
+        // // console.log("Score 1 : "+ scores[0] + " et score 2 : "+ scores[1]);
+        // $w("#text180").text = scores[1].toString();
     } catch(e){
+        console.log(e)
         wixLocation.to(wixLocation.url);
     }
 

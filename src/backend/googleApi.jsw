@@ -10,16 +10,41 @@ async function getApiKey() {
 }
 
 export async function getValuesFromSheet(range) {
-  const sheetId = await getSecretSheetId();
-  const apiKey = await getApiKey();
-  const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`;
+  try {
+    const sheetId = await getSecretSheetId();
+    const apiKey = await getApiKey();
 
-  const response = await fetch(url, { method: "GET" });
+    // Validate that both sheetId and apiKey are defined
+    if (!sheetId || !apiKey) {
+      throw new Error("Sheet ID or API key is missing.");
+    }
 
-  if (response.ok) {
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`;
+    const response = await fetch(url, { method: "GET" });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch values. Status: " + response.status);
+    }
+
     const json = await response.json();
     return json.values;
-  } else {
-    throw new Error("Failed to fetch values. Status: " + response.status);
+  } catch (error) {
+    console.error("Error fetching values:", error);
+    throw error;
   }
 }
+
+// export async function getValuesFromSheet(range) {
+//   const sheetId = await getSecretSheetId();
+//   const apiKey = await getApiKey();
+//   const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`;
+
+//   const response = await fetch(url, { method: "GET" });
+
+//   if (response.ok) {
+//     const json = await response.json();
+//     return json.values;
+//   } else {
+//     throw new Error("Failed to fetch values. Status: " + response.status);
+//   }
+// }
